@@ -1,7 +1,7 @@
 #include "SprintVision.h"
 
-#define POS_LABLE 1
-#define NEG_LABLE 0
+
+
 // #define RUN_ON_DARWIN 
 
 int main(int argc, char const *argv[]) {
@@ -21,6 +21,9 @@ int main(int argc, char const *argv[]) {
             cerr<<"frame empty"<<endl;
             return -1;
         }
+
+
+
 #ifdef RUN_ON_DARWIN
         cv::flip(frame, frame, -1);
         cv::resize(frame, frame, cv::Size(320, 240));

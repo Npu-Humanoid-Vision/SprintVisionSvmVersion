@@ -1,6 +1,10 @@
 #ifndef SPRINT_VISION_H
 #define SPRINT_VISION_H
 
+// 正负样本的 lable
+#define POS_LABLE 1
+#define NEG_LABLE 0
+
 // 调参开关
 #define ADJUST_PARAMETER
 
@@ -53,7 +57,7 @@ protected:
 class SprintResult : public ImgProcResult
 {
 public:
-    cv::Point2f center_;
+    cv::Point center_;
     bool valid_;
 public:
     SprintResult() : center_(),
@@ -73,7 +77,12 @@ public:
 };
 
 struct AllParameters {
-
+    int c_min_thre;
+    int c_max_thre;
+    int c_direc_forw;
+    int c_erode_times;
+    int c_dilat_times;
+    int c_s_thre;
 };
 
 class SprintVision : public ImgProc {
@@ -88,11 +97,9 @@ public: // 假装是接口的函数
 
     cv::Mat ProcessColor(cv::Mat pretread_image);                           // 颜色操作
 
-    void GetPossibleRect(cv::Mat binary_image);                             // 从二值图获得所有可能区域
+    std::vector<cv::Rect> GetPossibleRect(cv::Mat binary_image);            // 从二值图获得所有可能区域
 
-    cv::Rect JudgeRectBySVM(std::vector<cv::Rect>& cadidate_rects);         // 喂待选区域给 SVM 进行分类
-
-    void JUdgeResultLegal();                                                // 手工判断合法
+    cv::Mat GetHogVec(cv::Rect roi);                                        // 获得src_img 上 roi 的 HOG 特征向量
 
 public: // 真实的接口函数
     void LoadParameters();                                                  // 从文件加载参数
@@ -101,12 +108,12 @@ public: // 真实的接口函数
 
     void set_all_parameters(AllParameters);                                 // 调参时候传入参数
 
-    void set_not_found();                                                   // 不合法时候设为没找到
-
     void WriteImg(cv::Mat src, string folder_name, int num);                // 写图片
 
 public: // 数据成员
     cv::Mat src_image_;
+    cv::Mat src_hsv_channels_[3];
+    cv::Mat used_channel;
     cv::Mat pretreaded_image_;
     cv::Mat thresholded_image_;
     std::vector<cv::Rect> possible_rects_;
@@ -121,13 +128,22 @@ public: // 数据成员
     int color_dilate_times_;
     int color_s_thre_;
 
-    // 用于 SVM 获得多个可能结果时候检验
+    // 用于获得多个可能结果时候检验
+    bool init_former_rect_;
     cv::Rect former_result_rect_;
 
     // 存图相关
     int start_file_num_;
     int max_file_num_;
+
+    // SVM model path
+    string svm_model_name_;
+
+    // 所有在GetPossibleRect得到的待选Rect
+    cv::Rect nearest_rect_;
 };
+
+
 
 
 
