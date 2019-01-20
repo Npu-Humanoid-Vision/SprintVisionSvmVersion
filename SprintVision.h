@@ -141,6 +141,9 @@ public: // 数据成员
 
     // 所有在GetPossibleRect得到的待选Rect
     cv::Rect nearest_rect_;
+
+    // 结果Rect
+    cv::Rect result_rect_;
 };
 
 

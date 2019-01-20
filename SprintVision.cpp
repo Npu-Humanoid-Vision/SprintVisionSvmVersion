@@ -19,9 +19,13 @@ void SprintVision::imageProcess(cv::Mat input_image, ImgProcResult* output_resul
 
     // 喂所有可能的 Rect 给 SVM classifier
     std::vector<cv::Rect> pos_lable_rects; // 存所有 perdict 为 pos lable 的 rect
+    cout<<possible_rects_.size()<<endl;
     for (std::vector<cv::Rect>::iterator iter = possible_rects_.begin();
          iter != possible_rects_.end(); iter++) {
-
+        if (iter->area() < 20) {
+            continue;
+        }
+        cout<<*iter<<endl;
         cv::Mat roi_hog_vec = GetHogVec(*iter);
         int lable = (int)svm_classifier_.predict(roi_hog_vec);
         if (lable == POS_LABLE) {
@@ -47,23 +51,22 @@ void SprintVision::imageProcess(cv::Mat input_image, ImgProcResult* output_resul
     }
 
 
-    cv::Rect final_rect;
     if (pos_lable_rects.size() == 0) { // 未检出pos lable，即未初始化former_rect_
         final_result_.valid_ = false;
         init_former_rect_ = false;
     }
     else if (pos_lable_rects.size() == 1) { // 就是它！
-        final_rect = pos_lable_rects[0];
+        result_rect_ = pos_lable_rects[0];
         final_result_.valid_ = true;
     }
     else { // 有多个pos lable， 返回 与之前的 Rect 距离最近的待选Rect
-        final_rect = nearest_rect_;
+        result_rect_ = nearest_rect_;
     }
 
     if (final_result_.valid_) {
-        final_result_.center_ = cv::Point(final_rect.x + cvRound(final_rect.width/2.0),
-                                          final_rect.y + cvRound(final_rect.height/2.0));
-        former_result_rect_ = final_rect;
+        final_result_.center_ = cv::Point(result_rect_.x + cvRound(result_rect_.width/2.0),
+                                          result_rect_.y + cvRound(result_rect_.height/2.0));
+        former_result_rect_ = result_rect_;
     }
 
     (*dynamic_cast<SprintResult*>(output_result)) = final_result_;
@@ -71,7 +74,7 @@ void SprintVision::imageProcess(cv::Mat input_image, ImgProcResult* output_resul
 #ifndef ADJUST_PARAMETER
     this->WriteImg(src_image_,"src_img",start_file_num_);
     if (final_result_.valid_) {
-        cv::rectangle(src_image_, final_rect, cv::Scalar(0, 255, 0));
+        cv::rectangle(src_image_, result_rect_, cv::Scalar(0, 255, 0));
     }
     this->WriteImg(src_image_,"center_img",start_file_num_++);
 #endif
@@ -146,12 +149,17 @@ std::vector<cv::Rect> SprintVision::GetPossibleRect(cv::Mat binary_image) {
 
 cv::Mat SprintVision::GetHogVec(cv::Rect roi) {
     cv::Mat roi_in_mat = src_image_(roi).clone();
+    // SHOW_IMAGE(roi_in_mat);
     cv::resize(roi_in_mat, roi_in_mat, cv::Size(32, 32)); // 与训练相关参数，之后最好做成文件传入参数
+    // SHOW_IMAGE(roi_in_mat);
     cv::HOGDescriptor hog_des(Size(32, 32), Size(16,16), Size(8,8), Size(8,8), 9);
     std::vector<float> hog_vec;
+    hog_des.compute(roi_in_mat, hog_vec);
 
     cv::Mat t(hog_vec);
+    // cout<<t<<endl;
     cv::Mat hog_vec_in_mat = t.t();
+    // cout<<hog_vec_in_mat<<endl;
     hog_vec_in_mat.convertTo(hog_vec_in_mat, CV_32FC1);
     return hog_vec_in_mat;
 }
