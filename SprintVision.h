@@ -5,8 +5,6 @@
 #define POS_LABLE 1
 #define NEG_LABLE 0
 
-// 调参开关
-#define ADJUST_PARAMETER
 
 #include <opencv2/opencv.hpp>
 #include <fstream> // 推荐在基类加...
