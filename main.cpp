@@ -1,3 +1,6 @@
+// 调参开关
+#define ADJUST_PARAMETER
+
 #include "SprintVision.h"
 
 cv::VideoCapture cp(0);
