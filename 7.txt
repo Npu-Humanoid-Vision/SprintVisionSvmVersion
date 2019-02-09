@@ -1,0 +1,7 @@
+000___color_min_thre
+034___color_max_thre
+001___color_direction_forward
+000___color_erode_times
+006___color_dilate_times
+075__color_s_thre
+linear_auto.xml
