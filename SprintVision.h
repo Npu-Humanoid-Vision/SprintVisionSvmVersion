@@ -89,11 +89,11 @@ public:
     ~SprintVision();
 
 public: // 假装是接口的函数
-    void imageProcess(cv::Mat input_image, ImgProcResult* output_result);  // 对外接口
+    void imageProcess(cv::Mat input_image, ImgProcResult* output_result);   // 对外接口
 
     cv::Mat Pretreat(cv::Mat raw_image);                                    // 所有图像进行目标定位前的预处理
 
-    cv::Mat ProcessColor(cv::Mat pretread_image);                           // 颜色操作
+    cv::Mat ProcessColor();                                                 // 颜色操作
 
     std::vector<cv::Rect> GetPossibleRect(cv::Mat binary_image);            // 从二值图获得所有可能区域
 

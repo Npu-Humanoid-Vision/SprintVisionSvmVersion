@@ -92,7 +92,7 @@ cv::Mat SprintVision::Pretreat(cv::Mat raw_image) {
     return blured_image;
 }
 
-cv::Mat SprintVision::ProcessColor(cv::Mat pretread_image) {
+cv::Mat SprintVision::ProcessColor() {
     cv::Mat mask = src_hsv_channels_[1] >= color_s_thre_;
     cv::Mat thre_result;
     if (color_direction_forward_) {
@@ -229,7 +229,7 @@ void SprintVision::StoreParameters() {
     out_file << setw(3) << setfill('0') << color_direction_forward_     <<"___color_direction_forward"<<endl;
     out_file << setw(3) << setfill('0') << color_erode_times_           <<"___color_erode_times"<<endl;
     out_file << setw(3) << setfill('0') << color_dilate_times_          <<"___color_dilate_times"<<endl;
-    out_file << setw(3) << setfill('0') << color_s_thre_                <<"__color_s_thre"<<endl;
+    out_file << setw(3) << setfill('0') << color_s_thre_                <<"___color_s_thre"<<endl;
     out_file << svm_model_name_;
     out_file.close();
 }
